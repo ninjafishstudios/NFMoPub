@@ -29,4 +29,7 @@ typedef enum {
 
 - (void)showInterstitial:(NSString *)label;
 
+- (void)showBannerAd;
+- (void)showBannerAd:(NSString *)label;
+
 @end

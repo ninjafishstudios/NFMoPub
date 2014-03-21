@@ -67,9 +67,18 @@
     return topViewController;
 }
 
-
 - (void)showBannerAd{
+    [self showBannerAd:nil];
+}
+
+
+- (void)showBannerAd:(NSString *)label{
     [self.adView removeFromSuperview];
+    
+    if(label && [label isEqualToString:@"Remove Ads"]){
+        return;
+    }
+    
     
     CGSize bannerSize;
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad){
@@ -88,13 +97,13 @@
 
     
     if(self.bannerAdPosition == NFMoPubBannerAdPositionBottom){
-        self.bannerAdFrame = CGRectMake(0, view.bounds.size.height - bannerSize.height,
+        self.bannerAdFrame = CGRectMake((view.bounds.size.width - bannerSize.width) * 0.5, view.bounds.size.height - bannerSize.height,
                                         bannerSize.width, bannerSize.height);
         self.adView.frame = CGRectOffset(self.bannerAdFrame, 0, self.bannerAdFrame.size.height);
         
         
     }else if(self.bannerAdPosition == NFMoPubBannerAdPositionTop){
-        self.bannerAdFrame = CGRectMake(0, 0,
+        self.bannerAdFrame = CGRectMake((view.bounds.size.width - bannerSize.width) * 0.5, 0,
                                         bannerSize.width, bannerSize.height);
         self.adView.frame = CGRectOffset(self.bannerAdFrame, 0, -self.bannerAdFrame.size.height);
     }
@@ -127,7 +136,7 @@
     UIView *view = topViewController.view;
     
     for(UIView *subview in view.subviews){
-        if(abs(subview.frame.origin.y - self.adView.frame.origin.y) < self.adView.frame.size.height * 0.8){
+        if( (subview.frame.origin.x > self.adView.frame.origin.x && subview.frame.origin.x < (self.adView.frame.origin.x + self.adView.frame.size.width)) &&  abs(subview.frame.origin.y - self.adView.frame.origin.y) < self.adView.frame.size.height * 0.8){
             if(subview.frame.size.height < view.frame.size.height * 0.4 && subview != self.adView){
                 [viewsToMove addObject:subview];
             }
@@ -147,8 +156,6 @@
         }
     }completion:nil];
 
-    
-    
 }
 
 
