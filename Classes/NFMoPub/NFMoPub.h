@@ -26,4 +26,7 @@ typedef enum {
 
 + (NFMoPub *)sharedInstance;
 
+
+- (void)showInterstitial:(NSString *)label;
+
 @end
