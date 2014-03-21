@@ -11,4 +11,7 @@
 
 + (NFMoPub *)sharedInstance;
 
+
+- (void)showInterstitial:(NSString *)label;
+
 @end
