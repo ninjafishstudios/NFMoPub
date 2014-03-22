@@ -120,43 +120,27 @@
 - (void)adViewDidLoadAd:(MPAdView *)view
 {
     NSLog(@"ad view did load");
-    [UIView animateWithDuration:0.7 animations:^{
-        self.adView.frame = self.bannerAdFrame;
-    }completion:^(BOOL finished){
-    }];
     
-    [self makeSpaceForBannerAd];
-}
-
-
--(void)makeSpaceForBannerAd{
-    
-    NSMutableArray *viewsToMove = [[NSMutableArray alloc] init];
-    UIViewController *topViewController = [self applicationsCurrentTopViewController];
-    UIView *view = topViewController.view;
-    
-    for(UIView *subview in view.subviews){
-        if( (subview.frame.origin.x > self.adView.frame.origin.x && subview.frame.origin.x < (self.adView.frame.origin.x + self.adView.frame.size.width)) &&  abs(subview.frame.origin.y - self.adView.frame.origin.y) < self.adView.frame.size.height * 0.8){
-            if(subview.frame.size.height < view.frame.size.height * 0.4 && subview != self.adView){
-                [viewsToMove addObject:subview];
+    if(self.shouldAnimateBannerAdPresentation){
+        [UIView animateWithDuration:0.7 animations:^{
+            self.adView.frame = self.bannerAdFrame;
+        }completion:^(BOOL finished){
+            if(self.delegate && [self.delegate respondsToSelector:@selector(adSdkInstance:didDisplayBannerAd:)]){
+                [self.delegate adSdkInstance:self didDisplayBannerAd:self.adView];
             }
-        }
+        }];
+    }else{
+        self.adView.frame = self.bannerAdFrame;
     }
     
-    int directionToMoveViews = 1;
-    
-    if(self.adView.frame.origin.y > view.frame.size.height * 0.5){
-        directionToMoveViews = -1;
+    if(self.delegate && [self.delegate respondsToSelector:@selector(adSdkInstance:willDisplayBannerAd:)]){
+        [self.delegate adSdkInstance:self willDisplayBannerAd:self.adView];
     }
     
-    
-    [UIView animateWithDuration:0.7 animations:^{
-        for (UIView *subview in viewsToMove){
-            subview.frame = CGRectOffset(subview.frame, 0, self.adView.frame.size.height * directionToMoveViews);
-        }
-    }completion:nil];
-
+//    [self makeSpaceForBannerAd:self.adView animated:self.shouldAnimateBannerAdPresentation];
 }
+
+
 
 
 @end

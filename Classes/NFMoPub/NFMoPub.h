@@ -8,6 +8,16 @@
 #import <Foundation/Foundation.h>
 #import "MPInterstitialAdController.h"
 #import "MPAdView.h"
+@class NFMoPub;
+
+@protocol NFMoPubDelegate <NSObject>
+@optional
+-(void)adSdkInstance:(NFMoPub *)adSdkInstance didDisplayBannerAd:(UIView *)bannerAdView;
+@optional
+-(void)adSdkInstance:(NFMoPub *)adSdkInstance willDisplayBannerAd:(UIView *)bannerAdView;
+
+@end
+
 
 
 typedef enum {
@@ -23,6 +33,10 @@ typedef enum {
 @property (nonatomic, retain) MPAdView *adView;
 @property NFMoPubBannerAdPosition bannerAdPosition;
 @property CGRect bannerAdFrame;
+@property BOOL shouldAnimateBannerAdPresentation;
+
+@property (nonatomic, unsafe_unretained) id<NFMoPubDelegate> delegate;
+
 
 + (NFMoPub *)sharedInstance;
 
