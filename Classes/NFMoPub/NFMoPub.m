@@ -8,9 +8,9 @@
 #import "NFMoPub.h"
 
 #import "MPInterstitialAdController.h"
+#import "MPInterstitialViewController.h"
 
-
-@interface NFMoPub()<MPAdViewDelegate>{
+@interface NFMoPub()<MPAdViewDelegate, MPInterstitialViewControllerDelegate, MPInterstitialAdControllerDelegate>{
 
 }
 @end
@@ -50,8 +50,10 @@
     self.interstitial = [MPInterstitialAdController
                          interstitialAdControllerForAdUnitId: self.interstialAdUnitId];
     
-    // Fetch the interstitial ad.
+    [self.interstitial setDelegate:self];
+
     [self.interstitial loadAd];
+
 }
 
 
@@ -112,6 +114,12 @@
 }
 
 
+-(void)removeBannerAd{
+    [self.adView removeFromSuperview];
+    
+}
+
+
 #pragma mark - <MPAdViewDelegate>
 - (UIViewController *)viewControllerForPresentingModalView {
     return [self applicationsCurrentTopViewController];
@@ -119,8 +127,6 @@
 
 - (void)adViewDidLoadAd:(MPAdView *)view
 {
-    NSLog(@"ad view did load");
-    
     if(self.shouldAnimateBannerAdPresentation){
         [UIView animateWithDuration:0.7 animations:^{
             self.adView.frame = self.bannerAdFrame;
@@ -141,6 +147,43 @@
 }
 
 
+#pragma mark Delegate
+- (void)interstitialDidLoadAd:(MPInterstitialViewController *)interstitial{
+    NSLog(@"interstitial did load ad");
+    
+    [self.interstitial showFromViewController:[self applicationsCurrentTopViewController]];
+    
+    
+}
 
+- (void)interstitialDidFailToLoadAd:(MPInterstitialViewController *)interstitial{
+    NSLog(@"NFMoPub interstitial failed to load");
+    
+    if(self.delegate && [self.delegate respondsToSelector:@selector(didFailToLoadInterstitial:)]){
+        [self.delegate didFailToLoadInterstitial:nil];
+    }
+}
+- (void)interstitialWillAppear:(MPInterstitialViewController *)interstitial{
+    
+}
+- (void)interstitialDidAppear:(MPInterstitialViewController *)interstitial{
+    
+}
+- (void)interstitialWillDisappear:(MPInterstitialViewController *)interstitial{
+    NSLog(@"NFMoPub interstitial will disappear");
+    if(self.delegate && [self.delegate respondsToSelector:@selector(didCloseInterstitial:)]){
+        [self.delegate didCloseInterstitial:nil];
+    }
+}
+- (void)interstitialDidDisappear:(MPInterstitialViewController *)interstitial{
+    NSLog(@"NFMoPub interstitial did disappear");
+    
+    if(self.delegate && [self.delegate respondsToSelector:@selector(didCloseInterstitial:)]){
+        [self.delegate didCloseInterstitial:nil];
+    }
+}
+- (void)interstitialWillLeaveApplication:(MPInterstitialViewController *)interstitial{
+    
+}
 
 @end

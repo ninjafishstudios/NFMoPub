@@ -8,9 +8,10 @@
 #import <Foundation/Foundation.h>
 #import "MPInterstitialAdController.h"
 #import "MPAdView.h"
+#import "NFAdDisplayer.h"
 @class NFMoPub;
 
-@protocol NFMoPubDelegate <NSObject>
+@protocol NFMoPubDelegate <NFAdDisplayerDelegate>
 @optional
 -(void)adSdkInstance:(NFMoPub *)adSdkInstance didDisplayBannerAd:(UIView *)bannerAdView;
 @optional

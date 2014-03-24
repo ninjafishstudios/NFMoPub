@@ -23,6 +23,6 @@ Pod::Spec.new do |s|
   
   s.requires_arc = true
     
-	s.dependency 'MoPubSDK', '=1.12.1'
+	s.dependency 'MoPubClient'
   
 end
