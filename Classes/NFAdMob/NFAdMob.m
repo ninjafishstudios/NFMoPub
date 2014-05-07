@@ -1,23 +1,22 @@
 //
-//  NFMoPub.m
+//  NFAdMob.m
 //
 //  Created by William Locke on 3/5/13.
 //
 //
 
-#import "NFMoPub.h"
+#import "NFAdMob.h"
 
-#import "MPInterstitialAdController.h"
-#import "MPInterstitialViewController.h"
+#import "GADBannerView.h"
 
-@interface NFMoPub()<MPAdViewDelegate, MPInterstitialViewControllerDelegate, MPInterstitialAdControllerDelegate>{
-
+@interface NFAdMob()<GADBannerViewDelegate>{
+    GADBannerView *_bannerView;
 }
 @end
 
-@implementation NFMoPub
+@implementation NFAdMob
 
-+ (NFMoPub *)sharedInstance
++ (NFAdMob *)sharedInstance
 {
     // structure used to test whether the block has completed or not
     static dispatch_once_t p = 0;
@@ -43,18 +42,6 @@
     return self;
 }
 
-
-
-- (void)showInterstitial:(NSString *)label{
-    
-    self.interstitial = [MPInterstitialAdController
-                         interstitialAdControllerForAdUnitId: self.interstialAdUnitId];
-    
-    [self.interstitial setDelegate:self];
-
-    [self.interstitial loadAd];
-
-}
 
 
 -(UIViewController *)applicationsCurrentTopViewController{
@@ -89,28 +76,38 @@
         bannerSize = CGSizeMake(320, 50);
     }
     
-    self.adView = [[MPAdView alloc] initWithAdUnitId:self.bannerAdUnitId
-                                                size:bannerSize];
+    self.adView = [[GADBannerView alloc] initWithAdSize:kGADAdSizeBanner];
+    
+    
+    
     self.adView.delegate = self;
+    
+    self.adView.adUnitID = self.bannerAdUnitId;
+    
+
     
     UIViewController *topViewController = [self applicationsCurrentTopViewController];
     UIView *view = topViewController.view;
     
-
+    self.adView.rootViewController = topViewController;
     
-    if(self.bannerAdPosition == NFMoPubBannerAdPositionBottom){
+    
+    if(self.bannerAdPosition == NFAdMobBannerAdPositionBottom){
         self.bannerAdFrame = CGRectMake((view.bounds.size.width - bannerSize.width) * 0.5, view.bounds.size.height - bannerSize.height,
                                         bannerSize.width, bannerSize.height);
         self.adView.frame = CGRectOffset(self.bannerAdFrame, 0, self.bannerAdFrame.size.height);
         
         
-    }else if(self.bannerAdPosition == NFMoPubBannerAdPositionTop){
+    }else if(self.bannerAdPosition == NFAdMobBannerAdPositionTop){
         self.bannerAdFrame = CGRectMake((view.bounds.size.width - bannerSize.width) * 0.5, 0,
                                         bannerSize.width, bannerSize.height);
         self.adView.frame = CGRectOffset(self.bannerAdFrame, 0, -self.bannerAdFrame.size.height);
     }
     [view addSubview:self.adView];
-    [self.adView loadAd];
+    
+    GADRequest *request =[GADRequest request];
+    [request tagForChildDirectedTreatment:YES];
+    [self.adView loadRequest:request];
 }
 
 
@@ -125,7 +122,10 @@
     return [self applicationsCurrentTopViewController];
 }
 
-- (void)adViewDidLoadAd:(MPAdView *)view
+
+
+
+- (void)adViewDidReceiveAd:(GADBannerView *)view
 {
     if(self.shouldAnimateBannerAdPresentation){
         [UIView animateWithDuration:0.7 animations:^{
@@ -146,44 +146,5 @@
 //    [self makeSpaceForBannerAd:self.adView animated:self.shouldAnimateBannerAdPresentation];
 }
 
-
-#pragma mark Delegate
-- (void)interstitialDidLoadAd:(MPInterstitialViewController *)interstitial{
-    NSLog(@"interstitial did load ad");
-    
-    [self.interstitial showFromViewController:[self applicationsCurrentTopViewController]];
-    
-    
-}
-
-- (void)interstitialDidFailToLoadAd:(MPInterstitialViewController *)interstitial{
-    NSLog(@"NFMoPub interstitial failed to load");
-    
-    if(self.delegate && [self.delegate respondsToSelector:@selector(didFailToLoadInterstitial:)]){
-        [self.delegate didFailToLoadInterstitial:nil];
-    }
-}
-- (void)interstitialWillAppear:(MPInterstitialViewController *)interstitial{
-    
-}
-- (void)interstitialDidAppear:(MPInterstitialViewController *)interstitial{
-    
-}
-- (void)interstitialWillDisappear:(MPInterstitialViewController *)interstitial{
-    NSLog(@"NFMoPub interstitial will disappear");
-    if(self.delegate && [self.delegate respondsToSelector:@selector(didCloseInterstitial:)]){
-        [self.delegate didCloseInterstitial:nil];
-    }
-}
-- (void)interstitialDidDisappear:(MPInterstitialViewController *)interstitial{
-    NSLog(@"NFMoPub interstitial did disappear");
-    
-    if(self.delegate && [self.delegate respondsToSelector:@selector(didCloseInterstitial:)]){
-        [self.delegate didCloseInterstitial:nil];
-    }
-}
-- (void)interstitialWillLeaveApplication:(MPInterstitialViewController *)interstitial{
-    
-}
 
 @end
